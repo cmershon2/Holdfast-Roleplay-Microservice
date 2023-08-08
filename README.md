@@ -12,7 +12,7 @@ Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git`
-2. Navigate to the project directory: `cd roleplay-microservice`
+2. Navigate to the project directory: `cd Holdfast-Roleplay-Microservice`
 3. Install dependencies: `npm install`
 4. Configure environment variables: Create a `.env` file based on `.env.example` and fill in your configuration.
 
