@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Holdfast Roleplay Admin',
-  description: 'An online interface for managing Roleplay servers for Holdfast.',
+  description: 'An online interface & API for managing Roleplay servers for Holdfast.',
 }
 
 export default function RootLayout({
