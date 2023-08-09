@@ -1,4 +1,5 @@
 # Holdfast Roleplay Mircroservice
+![Project logo](https://github.com/cmershon2/Holdfast-Roleplay-Microservice/blob/inital-api-development/public/Harlow%20Solid.png?raw=true)
 
 Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This project aims to provide an easy-to-use online interface and API for managing roleplaying content within the popular game "Holdfast: Nations At War" on modded servers. Whether you're an admin looking to streamline roleplay events or a player seeking immersive experiences, this microservice has you covered.
 
