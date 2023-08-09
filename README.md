@@ -23,7 +23,7 @@ Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This
 3. Explore the API documentation at `http://localhost:3000/api/docs` to understand and utilize the available endpoints.
 
 ## API Endpoints
-The microservice provides various API endpoints to interact with roleplay content programmatically. For detailed information about each endpoint and how to use them, refer to the [API Documentation](http://localhost:3000/api/docs).
+The microservice provides various API endpoints to interact with roleplay content programmatically. For detailed information about each endpoint and how to use them, refer to the [API Documentation](http://localhost:3000/docs).
 
 ## Contributing
 Contributions are welcome! If you'd like to contribute to the project, follow these steps:
