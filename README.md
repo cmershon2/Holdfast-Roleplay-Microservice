@@ -4,12 +4,12 @@
 Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This project aims to provide an easy-to-use online interface and API for managing roleplaying content within the popular game "Holdfast: Nations At War" on modded servers. Whether you're an admin looking to streamline roleplay events or a player seeking immersive experiences, this microservice has you covered.
 
 ## Features
-- User-Friendly Interface: Manage roleplay content effortlessly through a user-friendly web interface.
-- API Endpoints: Access and manipulate roleplay data programmatically using the provided API endpoints.
-- Event Management: Schedule and coordinate roleplay events, assign roles, and more.
-- Content Customization: Create and customize various roleplay elements such as items, economy, interactions, and scenarios.
-- Real-time Updates: Enjoy real-time synchronization of roleplay data for an immersive gaming experience.
-- Modular and Extensible: Built on Next.js, the microservice is highly modular and can be extended to accommodate additional features.
+- **User-Friendly Interface**: Manage roleplay content effortlessly through a user-friendly web interface.
+- **API Endpoints**: Access and manipulate roleplay data programmatically using the provided API endpoints.
+- **Event Management**: Schedule and coordinate roleplay events, assign roles, and more.
+- **Content Customization**: Create and customize various roleplay elements such as items, economy, interactions, and scenarios.
+- **Real-time Updates**: Enjoy real-time synchronization of roleplay data for an immersive gaming experience.
+- **Modular and Extensible**: Built on Next.js, the microservice is highly modular and can be extended to accommodate additional features.
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git`
