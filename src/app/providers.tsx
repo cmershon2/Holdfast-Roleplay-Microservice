@@ -1,5 +1,6 @@
 'use client'
 
+import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from 'next-auth/react'
 
 type Props = {
@@ -7,5 +8,5 @@ type Props = {
 }
 
 export const Providers = ({ children }: Props) => {
-    return <SessionProvider> { children } </SessionProvider>
+    return <ThemeProvider attribute="class"><SessionProvider> { children } </SessionProvider></ThemeProvider>
 }
