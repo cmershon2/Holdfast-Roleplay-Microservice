@@ -99,7 +99,7 @@ async function sendInviteEmail(email: string, inviteToken: string): Promise<obje
                                                     </tr>
                                                     <tr>
                                                       <td align="center" class="es-p5t">
-                                                          <p>You have been invited to manage a Holdfast Roleplay Admin panel. This invite will expire in 45 hours.</p>
+                                                          <p>You have been invited to manage a Holdfast Roleplay Admin panel. This invite will expire in 48 hours.</p>
                                                       </td>
                                                     </tr>
                                                     <tr>

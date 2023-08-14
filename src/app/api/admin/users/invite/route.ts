@@ -14,12 +14,16 @@ export async function POST(req: Request, res: Response) {
   const { emails } = await req.json();
 
   try {
+    const currentTime = new Date();
+    const expirationTime = new Date(currentTime.getTime() + 48 * 60 * 60 * 1000); // 48 hours in milliseconds
+
     const inviteTokens = [];
 
     for (const email of emails) {
       const invite = await prisma.invite.create({
         data: {
-          email
+          email,
+          expiresAt: expirationTime,
         }
       });
 

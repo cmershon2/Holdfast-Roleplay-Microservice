@@ -27,7 +27,7 @@ model User {
 model Invite {
   id          String    @id @default(cuid())
   user        User?     @relation(fields: [userId], references: [id])
-  userId      String    @unique
+  userId      String?   @unique
   email       String    @unique
   token       String    @unique @default(cuid())
   sentAt      DateTime  @default(now())
