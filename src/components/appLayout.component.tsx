@@ -2,8 +2,7 @@ import { User } from "@/types/user/types";
 import { SidebarNavigation } from "./sidebarNavigation.component";
 import TopbarNavigation from "./topbarNavigation.component";
 import { Session, getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+import { authOptions } from "@/constants/auth/authOptions";
 
 export default async function AppLayout({ children } : any ) {
 

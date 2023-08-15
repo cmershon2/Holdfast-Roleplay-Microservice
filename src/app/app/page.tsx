@@ -1,8 +1,4 @@
 import AppLayout from "@/components/appLayout.component";
-import { Session, getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
-import { User } from "@/types/user/types";
-
 
 export default async function Overview() {
     return (
