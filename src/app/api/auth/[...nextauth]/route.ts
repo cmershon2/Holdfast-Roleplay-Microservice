@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
                     id: user.id+'',
                     email: user.email,
                     name: user.name,
+                    image: `https://api.dicebear.com/6.x/shapes/svg?seed=${user.name}`,
                     role: "ADMIN"
                 }
             }
@@ -64,7 +65,7 @@ export const authOptions: NextAuthOptions = {
             user: {
               ...session.user,
               id: token.id,
-              role: token.role
+              role: token.role,
             }
           }
         },
@@ -75,7 +76,8 @@ export const authOptions: NextAuthOptions = {
             return {
               ...token,
               id: u.id,
-              role: u.role
+              role: u.role,
+              image: u.image
             }
           }
           return token
