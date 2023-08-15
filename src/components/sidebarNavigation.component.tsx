@@ -92,7 +92,7 @@ export const SidebarNavigation = () => {
                 <Sidebar.Item href="/app/items" icon={GiAbdominalArmor}>
                   <p>Items</p>
                 </Sidebar.Item>
-                <Sidebar.Item href="/app/merchants" icon={GiShop} active>
+                <Sidebar.Item href="/app/merchants" icon={GiShop}>
                   <p>Merchants</p>
                 </Sidebar.Item>
               </Sidebar.Collapse>
