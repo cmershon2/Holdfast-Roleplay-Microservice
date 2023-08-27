@@ -35,8 +35,30 @@ model Invite {
   usedAt      DateTime?
 }
 
+model ServerToken {
+  id          String    @id @default(cuid())
+  name        String
+  token       String    @unique @default(uuid())
+  active      Boolean
+  createdAt   DateTime  @default(now())
+}
+
 
 // holdfast data model
+
+model ServerEvent {
+  id String @id @default(cuid())
+  serverName String
+  eventType eventType
+  timestamp DateTime @default(now())
+  playerCount Int
+}
+
+enum eventType {
+    START
+    END
+    HEARTBEAT
+}
 
 model HoldfastUser {
   id String @id @default(cuid())

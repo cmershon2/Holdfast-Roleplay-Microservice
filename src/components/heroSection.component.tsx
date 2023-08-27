@@ -12,10 +12,10 @@ return(
             </div>
 
             <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Holdfast Roleplay Admin</h1>
-            <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">This project aims to provide an easy-to-use online interface and API for managing roleplaying content within the popular game "Holdfast: Nations At War" on modded servers.</p>
+            <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">This project aims to provide an easy-to-use online interface and API for managing roleplaying content within the popular game Holdfast: Nations At War on modded servers.</p>
             
             <div className='flex justify-center'>
-                <Card className="max-w-sm mx-2" href="/docs" >
+                <Card className="max-w-sm mx-2" href="https://github.com/cmershon2/Holdfast-Roleplay-Microservice/wiki" >
 
                     <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         Documentation

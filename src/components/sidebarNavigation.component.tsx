@@ -1,11 +1,11 @@
 'use client'
 
 import { CustomFlowbiteTheme, Sidebar } from "flowbite-react"
-import { GiBackpack, GiCompass, GiPerson, GiAbstract050, GiAbdominalArmor, GiGearHammer, GiCoins, GiShop, GiSecretBook} from 'react-icons/gi';
+import { GiBackpack, GiCompass, GiPerson, GiAbstract050, GiAbdominalArmor, GiGearHammer, GiCoins, GiShop, GiSecretBook, GiKey} from 'react-icons/gi';
 
 const customTheme: CustomFlowbiteTheme['sidebar'] = {
     root: {
-      base: "h-full",
+      base: "mt-16 h-full",
       collapsed: {
         on: "w-16",
         off: "w-64"
@@ -111,6 +111,9 @@ export const SidebarNavigation = () => {
             >
                 <Sidebar.Item href="/app/users" icon={GiSecretBook}>
                     Manage Users
+                </Sidebar.Item>
+                <Sidebar.Item href="/app/tokens" icon={GiKey}>
+                    Manage Tokens
                 </Sidebar.Item>
             </Sidebar.Collapse>
           </Sidebar.ItemGroup>

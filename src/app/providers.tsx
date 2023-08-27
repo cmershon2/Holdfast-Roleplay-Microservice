@@ -8,5 +8,11 @@ type Props = {
 }
 
 export const Providers = ({ children }: Props) => {
-    return <ThemeProvider attribute="class"><SessionProvider> { children } </SessionProvider></ThemeProvider>
+    return (
+        <ThemeProvider attribute="class">
+            <SessionProvider> 
+                { children } 
+            </SessionProvider>
+        </ThemeProvider>
+    )
 }

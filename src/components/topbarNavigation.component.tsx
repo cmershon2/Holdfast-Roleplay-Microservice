@@ -10,6 +10,7 @@ export default function TopbarNavigation( user: User ) {
     <Navbar
       fluid
       border
+      className='fixed w-full h-16 top-0'
     >
       <Navbar.Brand href="/">
         <img
