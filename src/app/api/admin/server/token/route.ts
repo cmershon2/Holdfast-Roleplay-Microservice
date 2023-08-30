@@ -153,7 +153,7 @@ export async function DELETE(req: NextRequest) {
 
             const servertoken = await prisma.serverToken.delete({
                 where: {
-                    token: serverTokenId
+                    id: serverTokenId
                 }
             });
             return NextResponse.json({ servertoken }, {status:200});
