@@ -1,7 +1,10 @@
 'use client'
 
+import { SideBarAdminStructure, SideBarStructure } from "@/constants/entities/sideBarStructure";
+import { sideBarLink } from "@/types/navigation/types";
 import { CustomFlowbiteTheme, Sidebar } from "flowbite-react"
-import { GiBackpack, GiCompass, GiPerson, GiAbstract050, GiAbdominalArmor, GiGearHammer, GiCoins, GiShop, GiSecretBook, GiKey} from 'react-icons/gi';
+import { usePathname } from "next/navigation";
+
 
 const customTheme: CustomFlowbiteTheme['sidebar'] = {
     root: {
@@ -72,50 +75,55 @@ const customTheme: CustomFlowbiteTheme['sidebar'] = {
     }
   }
 
+const SidebarLink = ( link : sideBarLink ) => {
+  const router = usePathname();
+  let activeChild = false;
+
+  // open parent dropdown if child is active
+  if(link.links != undefined) {
+    link.links.map((nestedLink : sideBarLink) => {
+      if(router === nestedLink.href)
+      {
+        activeChild = true;
+      }
+    })
+  }
+
+  return (
+    <>
+      {link.links != undefined && (
+        <Sidebar.Collapse icon={link.icon} label={link.label} open={activeChild}>
+          {link.links.map((nestedLink : sideBarLink) => (
+              <SidebarLink {...nestedLink} />
+          ))}
+        </Sidebar.Collapse>
+      )}
+      { link.links == undefined && (
+        <Sidebar.Item href={link.href} icon={link.icon} active={router === link.href ? true : false}>
+          <p>{link.label}</p>
+      </Sidebar.Item>
+      )}
+    </>
+  );
+};
 
 export const SidebarNavigation = () => {
-
   return(
     <Sidebar theme={customTheme} aria-label="Sidebar Navigation">
       <Sidebar.Items>
           <Sidebar.ItemGroup>
-              <Sidebar.Item href="/app" icon={GiAbstract050}>
-                  <p>Overview</p>
-              </Sidebar.Item>
-              <Sidebar.Item href="/app/players" icon={GiPerson}>
-                  <p>Players</p>
-              </Sidebar.Item>
-              <Sidebar.Collapse
-                icon={GiCoins}
-                label="Economy"
-              >
-                <Sidebar.Item href="/app/items" icon={GiAbdominalArmor}>
-                  <p>Items</p>
-                </Sidebar.Item>
-                <Sidebar.Item href="/app/merchants" icon={GiShop}>
-                  <p>Merchants</p>
-                </Sidebar.Item>
-              </Sidebar.Collapse>
-              <Sidebar.Item href="/app/quests" icon={GiCompass}>
-                  <p>Quests</p>
-              </Sidebar.Item>
-              <Sidebar.Item href="/app/inventories" icon={GiBackpack}>
-                  <p>Inventories</p>
-              </Sidebar.Item>
-              
+              {
+                SideBarStructure.map((data) => (
+                    <SidebarLink {...data} />
+                ))
+              }              
           </Sidebar.ItemGroup>
           <Sidebar.ItemGroup>
-            <Sidebar.Collapse
-                icon={GiGearHammer}
-                label="Admin Settings"
-            >
-                <Sidebar.Item href="/app/users" icon={GiSecretBook}>
-                    Manage Users
-                </Sidebar.Item>
-                <Sidebar.Item href="/app/tokens" icon={GiKey}>
-                    Manage Tokens
-                </Sidebar.Item>
-            </Sidebar.Collapse>
+            {
+              SideBarAdminStructure.map((data) => (
+                  <SidebarLink {...data} />
+              ))
+            }
           </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>
