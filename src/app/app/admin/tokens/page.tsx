@@ -1,6 +1,5 @@
 import AppLayout from "@/components/appLayout.component";
-import { cookies } from "next/headers";
-import ServerTokenTable from "@/components/serverTokenTable.component";
+import ServerTokenTable from "@/components/serverTable.component";
 
 export default async function Page() {
 

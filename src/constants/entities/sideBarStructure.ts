@@ -1,5 +1,5 @@
 import { sideBarLink } from '@/types/navigation/types';
-import { GiBackpack, GiCompass, GiPerson, GiAbstract050, GiAbdominalArmor, GiGearHammer, GiCoins, GiShop, GiSecretBook, GiKey} from 'react-icons/gi';
+import { GiServerRack, GiBackpack, GiCompass, GiPerson, GiAbstract050, GiAbdominalArmor, GiGearHammer, GiCoins, GiShop, GiSecretBook, GiKey} from 'react-icons/gi';
 
 export const SideBarStructure: sideBarLink[] = [
     {
@@ -55,14 +55,20 @@ export const SideBarAdminStructure : sideBarLink[] = [
         links: [
             {
                 label: 'Manage Users',
-                href: '/app/users',
+                href: '/app/admin/users',
                 icon: GiSecretBook,
                 links: undefined
             },
             {
                 label: 'Manage Tokens',
-                href: '/app/tokens',
+                href: '/app/admin/tokens',
                 icon: GiKey,
+                links: undefined
+            },
+            {
+                label: 'Manage Servers',
+                href: '/app/admin/servers',
+                icon: GiServerRack,
                 links: undefined
             }
         ]

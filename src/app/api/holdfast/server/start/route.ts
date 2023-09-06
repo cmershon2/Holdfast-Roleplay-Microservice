@@ -1,3 +1,4 @@
+import { getRequestBody } from '@/lib/apiHelpers';
 import { prisma } from '@/lib/prisma';
 import { prismaErrorHandler } from '@/lib/prismaErrorHandler';
 import { serverTokenValidator } from '@/lib/serverTokenValidator';
@@ -8,10 +9,14 @@ import { z } from "zod";
 export async function POST(req: Request, res: Response) {
     const headersList = headers();
     const serverToken = headersList.get('token');
-    const data = await req.json();
+    const data = await getRequestBody(req);
 
     if(serverToken == null){
         return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
+    }
+
+    if(data == null){
+        return NextResponse.json({ message: 'Invalid request', errors:[{message:"Missing request body"}] }, {status: 400});
     }
 
     // validate server token
@@ -22,7 +27,7 @@ export async function POST(req: Request, res: Response) {
 
     // validate sent data
     const schema = z.object({
-        serverName: z.string()
+        serverId: z.string()
     })
     
     const response = schema.safeParse(data);
@@ -33,14 +38,25 @@ export async function POST(req: Request, res: Response) {
     }
     
 
-    const { serverName } = response.data;
+    const { serverId } = response.data;
 
     // attempt to create new server start event
     try {
         try {
+            // set server to online
+            const serverStatusUpdate = await prisma.server.update({
+                where:{
+                    id: serverId
+                },
+                data: {
+                    status: 'ONLINE'
+                }
+            });
+
+            // create start event
             const event = await prisma.serverEvent.create({
                 data:{
-                    serverName: serverName,
+                    serverId: serverId,
                     eventType: 'START',
                     playerCount: 0
                 }

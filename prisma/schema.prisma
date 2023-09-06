@@ -46,9 +46,25 @@ model ServerToken {
 
 // holdfast data model
 
+model Server {
+  id String @id @default(cuid())
+  name String @unique
+  description String?
+  lastRunDate DateTime?
+  status serverStatus
+  events ServerEvent[]
+}
+
+enum serverStatus {
+    ONLINE
+    OFFLINE
+    TIMEOUT
+}
+
 model ServerEvent {
   id String @id @default(cuid())
-  serverName String
+  serverId String @unique
+  server Server @relation(fields: [serverId], references: [id])
   eventType eventType
   timestamp DateTime @default(now())
   playerCount Int

@@ -2,7 +2,9 @@
 
 import { SideBarAdminStructure, SideBarStructure } from "@/constants/entities/sideBarStructure";
 import { sideBarLink } from "@/types/navigation/types";
+import { User } from "@/types/user/types";
 import { CustomFlowbiteTheme, Sidebar } from "flowbite-react"
+
 import { usePathname } from "next/navigation";
 
 
@@ -107,7 +109,8 @@ const SidebarLink = ( link : sideBarLink ) => {
   );
 };
 
-export const SidebarNavigation = () => {
+export const SidebarNavigation = ( user: User ) => {
+
   return(
     <Sidebar theme={customTheme} aria-label="Sidebar Navigation">
       <Sidebar.Items>
@@ -118,13 +121,15 @@ export const SidebarNavigation = () => {
                 ))
               }              
           </Sidebar.ItemGroup>
-          <Sidebar.ItemGroup>
-            {
-              SideBarAdminStructure.map((data) => (
-                  <SidebarLink {...data} />
-              ))
-            }
-          </Sidebar.ItemGroup>
+          {user.role == 'ADMIN' && (
+            <Sidebar.ItemGroup>
+              {
+                SideBarAdminStructure.map((data) => (
+                    <SidebarLink {...data} />
+                ))
+              }
+            </Sidebar.ItemGroup>
+          )}
       </Sidebar.Items>
     </Sidebar>
   )

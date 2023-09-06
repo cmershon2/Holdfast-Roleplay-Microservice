@@ -19,7 +19,7 @@ export default async function AppLayout({ children } : any ) {
     return(
         <div className="antialiased bg-gray-50 dark:bg-gray-900">
             <TopbarNavigation {...user} />
-            <SidebarNavigation />
+            <SidebarNavigation {...user} />
             <ToastContainer />
             <main className="p-14 md:ml-64 h-auto">
                 { children }
