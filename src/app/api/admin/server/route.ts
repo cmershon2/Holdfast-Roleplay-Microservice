@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
                 prisma.server.count() // count ALL servers
             ]);
 
-            return NextResponse.json({ servers, total }, {status:200});
+            return NextResponse.json({ servers, page: { start: skip, total } }, {status:200});
 
         } catch (error) {
             return prismaErrorHandler('Error getting servers', error);
@@ -60,6 +60,7 @@ export async function PATCH(req: NextRequest) {
     const schema = z.object({
         id: z.string(),
         name: z.string(),
+        description: z.string(),
     })
     
     const response = schema.safeParse(data);
@@ -69,7 +70,7 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ message: 'Invalid request', errors }, {status: 400});
     }
 
-    const { id, name } = response.data;
+    const { id, name, description } = response.data;
 
     try {
         try {
@@ -79,6 +80,7 @@ export async function PATCH(req: NextRequest) {
                 },
                 data: {
                     name: name,
+                    description: description
                 }
             });
 
@@ -93,7 +95,7 @@ export async function PATCH(req: NextRequest) {
     }
 }
 
-// create a new server token
+// create a new server
 export async function POST(req: NextRequest) {
     const token = await getToken({req})
     const data = await getRequestBody(req);
@@ -109,7 +111,8 @@ export async function POST(req: NextRequest) {
 
     // zod data validation
     const schema = z.object({
-        name: z.string()
+        name: z.string(),
+        description: z.string()
     })
     
     const response = schema.safeParse(data);
@@ -119,7 +122,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: 'Invalid request', errors }, {status: 400});
     }
 
-    const { name } = response.data;
+    const { name, description } = response.data;
 
     try {
 
@@ -128,6 +131,7 @@ export async function POST(req: NextRequest) {
             const servertoken = await prisma.server.create({
                 data: {
                     name: name,
+                    description: description,
                     status: 'OFFLINE'
                 }
             });

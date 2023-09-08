@@ -96,7 +96,7 @@ const SidebarLink = ( link : sideBarLink ) => {
       {link.links != undefined && (
         <Sidebar.Collapse icon={link.icon} label={link.label} open={activeChild}>
           {link.links.map((nestedLink : sideBarLink) => (
-              <SidebarLink {...nestedLink} />
+              <SidebarLink key={nestedLink.label} {...nestedLink} />
           ))}
         </Sidebar.Collapse>
       )}
@@ -117,7 +117,7 @@ export const SidebarNavigation = ( user: User ) => {
           <Sidebar.ItemGroup>
               {
                 SideBarStructure.map((data) => (
-                    <SidebarLink {...data} />
+                    <SidebarLink key={data.label} {...data} />
                 ))
               }              
           </Sidebar.ItemGroup>
@@ -125,7 +125,7 @@ export const SidebarNavigation = ( user: User ) => {
             <Sidebar.ItemGroup>
               {
                 SideBarAdminStructure.map((data) => (
-                    <SidebarLink {...data} />
+                    <SidebarLink key={data.label} {...data} />
                 ))
               }
             </Sidebar.ItemGroup>

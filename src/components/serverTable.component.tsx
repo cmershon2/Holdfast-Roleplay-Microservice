@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Table, Badge, Modal, Label, TextInput, Select, Alert, Pagination, Tooltip, Checkbox, Radio } from "flowbite-react";
-import { GiServerRack, GiPencilRuler, GiSemiClosedEye, GiTrashCan, GiInfo } from 'react-icons/gi';
+import { Button, Table, Badge, Modal, Label, TextInput, Select, Alert, Pagination, Tooltip, Checkbox, Radio, Textarea } from "flowbite-react";
+import { GiServerRack, GiPencilRuler, GiSemiClosedEye, GiTrashCan, GiInfo, GiScrollUnfurled } from 'react-icons/gi';
 import { HiStatusOffline, HiStatusOnline, HiOutlineClock } from 'react-icons/hi';
 import { useEffect, useState } from "react";
 import { servers } from "@/types/tables/types";
@@ -16,11 +16,13 @@ export default function ServerTable() {
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(1);
+    const [pageTotal, setPageTotal] = useState<number>(0);
     const [openModal, setOpenModal] = useState<string | undefined>();
     const [buttonLoading, setButtonLoading] = useState<boolean>();
     const props = { openModal, setOpenModal, buttonLoading, setButtonLoading };
     const [data, setData] = useState<servers[]>()
     const [isLoading, setLoading] = useState(true)
+    const [tableSelection, setTableSelection] = useState<servers[]>(new Array<servers>)
     
     // Get Inital Page Data
     useEffect(() => {
@@ -35,19 +37,36 @@ export default function ServerTable() {
                 lastRunDate: item.lastRunDate
             }));
 
-            let pageCalc = Math.ceil(parseInt(data.total) / pageSize);
+            let pageCalc = Math.ceil(parseInt(data.page.total) / pageSize);
+            setPageTotal(parseInt(data.page.total))
             setPageCount(pageCalc)
             setData(allServers)
             setLoading(false)
         })
     }, [])
 
+    const handleRowSelection = ( data : servers) => { 
+    
+        let newSelection = [...tableSelection];
+        let index = newSelection.indexOf(data);
+        if (index !== -1) {
+            newSelection.splice(index, 1);
+        } else {
+             newSelection.push(data);
+        }
+
+        console.log(newSelection);
+
+        setTableSelection(newSelection);
+        
+    };
+    
     // Form Handlers
     const {
-        handleSubmit,
-        register,
-        setValue,
-        formState: { errors },
+        handleSubmit: updateSubmit,
+        register: updateRegister,
+        setValue: updateSetValue,
+        formState: { errors: updateErrors },
     } = useForm();
 
     //New Server Form
@@ -81,7 +100,9 @@ export default function ServerTable() {
                 lastRunDate: item.lastRunDate
             }));
 
-            let pageCalc = Math.ceil(parseInt(data.total) / pageSize);
+            let pageCalc = Math.ceil(parseInt(data.page.total) / pageSize);
+            setTableSelection(new Array<servers>);
+            setPageTotal(parseInt(data.page.total))
             setPageCount(pageCalc)
             setData(allServers)
             setLoading(false)
@@ -89,11 +110,14 @@ export default function ServerTable() {
     }
 
     // Handle Form Init
-    const updateEditModalFormValues = (data : servers) => {
-        setValue('editTokenId', data.id);
-        setValue('editTokenName', data.name);
+    const updateEditModalFormValues = () => {
+        let data: servers = tableSelection[0]
 
-        props.setOpenModal(`editToken`);
+        updateSetValue('editServerId', data.id);
+        updateSetValue('editServerName', data.name);
+        updateSetValue('editServerDescription', data.description);
+
+        props.setOpenModal(`editServer`);
     }
 
     const updateDeleteModalFormValues = (data : servers) => {
@@ -108,8 +132,7 @@ export default function ServerTable() {
         props.setButtonLoading(true);
 
         try {
-            const response = await axios.post('/api/admin/server', { name: data.newServerName });
-            console.log(page, pageSize);
+            const response = await axios.post('/api/admin/server', { name: data.newServerName, description: data.newServerDescription });
             props.setOpenModal(undefined);
             props.setButtonLoading(false);
             toast.success("Server Created", {
@@ -150,12 +173,12 @@ export default function ServerTable() {
         props.setButtonLoading(true);
 
         try {
-            const response = await axios.patch('/api/admin/server/token', { id:data.editTokenId, name: data.editTokenName, active: JSON.parse(data.editTokenStatus) });
+            const response = await axios.patch('/api/admin/server', { id:data.editServerId, name: data.editServerName, description: data.editServerDescription });
 
             console.log(response.data.message);
             props.setOpenModal(undefined);
             props.setButtonLoading(false);
-            toast.success("Server Token Updated", {
+            toast.success("Server Updated", {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -166,10 +189,14 @@ export default function ServerTable() {
                 theme: "colored",
             });
             reloadTableData(page, pageSize);
-        } catch (error) {
-            console.error('Error creating server token:', error);
+        } catch (error : any) {
+            console.error('Error updating server:', error);
             props.setButtonLoading(false);
-            toast.error("Server Token Update Failed", {
+            let errorMessage = "Server Creation Failed";
+            if(error.response.data.errorCode == "P2002"){
+                errorMessage = "Server Name Already Exists";
+            }
+            toast.error(errorMessage, {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -221,8 +248,9 @@ export default function ServerTable() {
 
     return(
     <>
+        {/* Table Buttons */}
         <div className='mb-4 flex'>
-            <Button className="mr-2" color="gray" onClick={() => props.setOpenModal('openTokenModal')}>
+            <Button className="mr-2" color="gray" onClick={() => props.setOpenModal('createServerModal')}>
                 <GiServerRack className="mr-3 h-4 w-4" />
                 <p>
                     New Server
@@ -230,18 +258,40 @@ export default function ServerTable() {
             </Button>
 
             <Button.Group className="mx-2">
-                <Button color="gray">
-                    <GiSemiClosedEye className="mr-3 h-4 w-4" />
-                    Log
-                </Button>
-                <Button color="gray" onClick={() => console.log("TODO: Edit") }>
-                    <GiPencilRuler className="mr-3 h-4 w-4" />
-                    Edit
-                </Button>
-                <Button color="gray" onClick={() => console.log("TODO: DELETE")}>
-                    <GiTrashCan className="mr-3 h-4 w-4" />
-                    Delete
-                </Button>
+                {tableSelection.length != 1 ? (
+                    <Button color="gray" disabled>
+                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                        Execution Log
+                    </Button>
+                ):(
+                    <Button color="gray">
+                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                        Execution Log
+                    </Button>
+                )}
+                {tableSelection.length != 1 ? (
+                    <Button color="gray" disabled>
+                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                        Edit
+                    </Button>
+                ):(
+                    <Button color="gray" onClick={ updateEditModalFormValues }>
+                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                        Edit
+                    </Button>
+                )}
+
+                {tableSelection.length == 0 ? (
+                    <Button color="gray" disabled>
+                        <GiTrashCan className="mr-3 h-4 w-4" />
+                        Delete
+                    </Button>
+                ):(
+                    <Button color="gray">
+                        <GiTrashCan className="mr-3 h-4 w-4" />
+                        Delete
+                    </Button>
+                )}
             </Button.Group>
         </div>
 
@@ -256,118 +306,147 @@ export default function ServerTable() {
 
         {/* Table Loading State */}
         { isLoading &&
-            <Table>
-                <Table.Head>
-                    <Table.HeadCell>
-                        Name
-                    </Table.HeadCell>
-                    <Table.HeadCell>
-                        Status
-                    </Table.HeadCell>
-                    <Table.HeadCell>
-                        Created At
-                    </Table.HeadCell>
-                    <Table.HeadCell>
-                        <span className="sr-only">
-                            Edit
-                        </span>
-                    </Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                    <Table.Row className="bg-white h-16 dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell className="w-4">
-                            <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        </Table.Cell>
-                    </Table.Row>
-                </Table.Body>
-            </Table>
+            <>
+                <Table>
+                    <Table.Head>
+                        <Table.HeadCell className="w-4">
+                        </Table.HeadCell>
+                        <Table.HeadCell className="w-4">
+                            Status
+                        </Table.HeadCell>
+                        <Table.HeadCell className="w-36">
+                            Last Run Date
+                        </Table.HeadCell>
+                        <Table.HeadCell>
+                            Name
+                        </Table.HeadCell>
+                        <Table.HeadCell>
+                            Description
+                        </Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body className="divide-y">
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+                <Pagination
+                    currentPage={1}
+                    onPageChange={ page=>{ } }
+                    showIcons
+                    totalPages={1}
+                />
+            </>
         }
         
         {/* Table Visible State */}
         { !isLoading && (data !== undefined && data?.length > 0) &&
             <>
-                <Table hoverable>
+                <Table hoverable className="max-w-full ">
                     <Table.Head>
                         <Table.HeadCell className="w-4">
+                        </Table.HeadCell>
+                        <Table.HeadCell className="w-4">
+                            ID
                         </Table.HeadCell>
                         <Table.HeadCell className="w-4">
                             Status
@@ -389,11 +468,10 @@ export default function ServerTable() {
                                 return(
                                 <Table.Row key={row.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                     <Table.Cell className="w-4">
-                                        <Radio
-                                            id={"select-"+row.id}
-                                            name="row-select"
-                                            value={row.id}
-                                        />
+                                        <Checkbox onChange={ () => handleRowSelection(row) } defaultValue='false' />
+                                    </Table.Cell>
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
+                                        {row.id}
                                     </Table.Cell>
                                     <Table.Cell className="w-4 px-10">
                                         {row.status=="TIMEOUT" && (<Tooltip content="Server Timed Out"><Badge icon={HiOutlineClock} color="warning"></Badge></Tooltip>)}
@@ -408,10 +486,10 @@ export default function ServerTable() {
                                             </Moment>
                                         )}
                                     </Table.Cell>
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-1/4 truncate">
                                         {row.name}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell className="truncate overflow-hidden max-w-sm">
                                         {row.description}
                                     </Table.Cell>
                                 </Table.Row>
@@ -420,34 +498,46 @@ export default function ServerTable() {
                         }
                     </Table.Body>
                 </Table>
-                <Pagination
-                    currentPage={page + 1}
-                    onPageChange={ page=>{ reloadTableData(page-1, pageSize); setPage(page-1) } }
-                    showIcons
-                    totalPages={pageCount}
-                />
+                <div className="w-full mt-2">
+                    <nav className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0"
+                        aria-label="Table navigation">
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span
+                            className="font-semibold text-gray-900 dark:text-white">{ (page*pageSize)+1 }-{((page+1)*pageSize)>pageTotal ? pageTotal : (page+1)*pageSize }</span> of <span
+                            className="font-semibold text-gray-900 dark:text-white">{pageTotal}</span>
+                        </span>
+                        
+                        <Pagination
+                            currentPage={page + 1}
+                            onPageChange={ page=>{ reloadTableData(page-1, pageSize); setPage(page-1) } }
+                            showIcons
+                            totalPages={pageCount}
+                        />
+                    </nav>
+                </div>
+                    
+                
             </>
         }
 
-        {/* Update Server */}
+        {/* Update Server Modal */}
         <Modal  
-            show={props.openModal === `editToken`} 
+            show={props.openModal === `editServer`} 
             onClose={() => props.setOpenModal(undefined)}
         >
             <Modal.Header>Update Server Token</Modal.Header>
             <Modal.Body>
                 <div className="space-y-6">
-                    <form  onSubmit={handleSubmit(onSubmitUpdate)}>
+                    <form  onSubmit={updateSubmit(onSubmitUpdate)}>
                         <div className="block">
                             <Label
-                                htmlFor="editTokenId"
-                                value="Token ID"
+                                htmlFor="editServerId"
+                                value="Server ID"
                             />
                         </div>
                         <TextInput
-                            {...register('editTokenId', { required: true })}
+                            {...updateRegister('editServerId', { required: true })}
                             className="mb-2"
-                            id="editTokenId"
+                            id="editServerId"
                             placeholder="123456"
                             required
                             disabled
@@ -455,26 +545,33 @@ export default function ServerTable() {
                         />
                         <div className="block">
                             <Label
-                                htmlFor="editTokenName"
-                                value="Token Name"
+                                htmlFor="editServerName"
+                                value="Server Name"
                             />
                         </div>
                         <TextInput
-                            {...register('editTokenName', { required: true })}
+                            {...updateRegister('editServerName', { required: true })}
                             className="mb-2"
-                            id="editTokenName"
-                            placeholder="my new holdfast token"
+                            id="editServerName"
+                            placeholder="My New Holdfast Server"
                             required
                             type="text"
                         />
 
-                        <Label htmlFor="editTokenStatus">
-                            Token Status
-                        </Label>
-                        <Select {...register('editTokenStatus', { required: true })} id="editTokenStatus" className="mb-2">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </Select>
+                        <div className="block">
+                            <Label
+                                htmlFor="editServerDescription"
+                                value="Server Description (Optional)"
+                            />
+                        </div>
+                        <Textarea
+                            {...updateRegister('editServerDescription', { required: false })}
+                            id="editServerDescription"
+                            className="mb-2"
+                            placeholder="A short description about your server"
+                            required
+                            rows={2}
+                        />
 
                         {props.buttonLoading &&
                             <Button isProcessing disabled>
@@ -491,7 +588,7 @@ export default function ServerTable() {
             </Modal.Body>
         </Modal>
 
-        {/* Server Log */}
+        {/* Server Log Modal */}
         <Modal  
             show={props.openModal === `viewToken`} 
             onClose={() => props.setOpenModal(undefined)}
@@ -545,7 +642,7 @@ export default function ServerTable() {
             </Modal.Body>
         </Modal>
 
-        {/* Delete Server */}
+        {/* Delete Server Modal */}
         <Modal  
             show={props.openModal === `deleteToken`} 
             onClose={() => props.setOpenModal(undefined)}
@@ -625,9 +722,9 @@ export default function ServerTable() {
             </Modal.Body>
         </Modal>
 
-        {/* Create Server */}
+        {/* Create Server Modal */}
         <Modal 
-            show={props.openModal === 'openTokenModal'} 
+            show={props.openModal === 'createServerModal'} 
             onClose={() => props.setOpenModal(undefined)}
         >
 
@@ -645,11 +742,25 @@ export default function ServerTable() {
                             {...newServerRegister('newServerName', { required: true })}
                             className="mb-2"
                             id="serverName"
-                            placeholder="my new holdfast server"
+                            placeholder="My New Holdfast Server"
                             required
                             type="text"
                         />
-                        {errors.name && <p>Server name is required</p>}
+
+                        <div className="block">
+                            <Label
+                                htmlFor="serverDescription"
+                                value="Description (Optional)"
+                            />
+                        </div>
+                        <Textarea
+                            {...newServerRegister('newServerDescription', { required: false })}
+                            id="serverDescription"
+                            className="mb-2"
+                            placeholder="A short description about your server"
+                            required
+                            rows={2}
+                        />
 
                         {props.buttonLoading &&
                             <Button isProcessing disabled>
