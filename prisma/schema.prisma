@@ -64,13 +64,22 @@ enum serverStatus {
 model ServerEvent {
   id String @id @default(cuid())
   serverId String @unique
+  start DateTime @default(now())
+  end DateTime
   server Server @relation(fields: [serverId], references: [id])
-  eventType eventType
+  eventLogs ServerEventLog[]
+}
+
+model ServerEventLog {
+  id String @id @default(cuid())
+  serverEventId String @unique
+  serverEvent ServerEvent @relation(fields: [serverEventId], references: [id])
+  logType logType
   timestamp DateTime @default(now())
   playerCount Int
 }
 
-enum eventType {
+enum logType {
     START
     END
     HEARTBEAT
@@ -88,7 +97,7 @@ model UserRoles {
   id String @id @default(cuid())
   holdfastUserId String @unique
   holdfastUser HoldfastUser @relation(fields: [holdfastUserId], references: [id])
-  roleId String
+  roleId String @unique
   holdfastRole holdfastRole @relation(fields: [roleId], references: [id])
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 }

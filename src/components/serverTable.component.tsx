@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Table, Badge, Modal, Label, TextInput, Select, Alert, Pagination, Tooltip, Checkbox, Radio, Textarea } from "flowbite-react";
-import { GiServerRack, GiPencilRuler, GiSemiClosedEye, GiTrashCan, GiInfo, GiScrollUnfurled } from 'react-icons/gi';
+import { Button, Table, Badge, Modal, Label, TextInput, Select, Alert, Pagination, Tooltip, Checkbox, Radio, Textarea, Dropdown } from "flowbite-react";
+import { GiServerRack, GiPencilRuler, GiBigGear, GiTrashCan, GiInfo, GiScrollUnfurled } from 'react-icons/gi';
 import { HiStatusOffline, HiStatusOnline, HiOutlineClock } from 'react-icons/hi';
 import { useEffect, useState } from "react";
 import { servers } from "@/types/tables/types";
@@ -9,6 +9,7 @@ import Moment from 'react-moment';
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { CopyToClipboard } from "./copyToClipboard.component";
 
 export default function ServerTable() {
 
@@ -74,6 +75,13 @@ export default function ServerTable() {
         handleSubmit: newServerSubmit,
         register: newServerRegister,
         formState: { errors: newServerErrors },
+    } = useForm();
+
+    //Page Size Form
+    const {
+        handleSubmit: newPageSizeSubmit,
+        register: newPageSizeRegister,
+        formState: { errors: newPageSizeErrors },
     } = useForm();
 
     const {
@@ -246,53 +254,127 @@ export default function ServerTable() {
         }
     };
 
+    useEffect(() => {
+        reloadTableData(page, pageSize);
+    }, [pageSize]);
+
+    const onSubmitPageSize = async (data: any) => {
+        setPage(0);
+        setPageSize(parseInt(data.pageSize));
+    };
+
     return(
     <>
         {/* Table Buttons */}
         <div className='mb-4 flex'>
-            <Button className="mr-2" color="gray" onClick={() => props.setOpenModal('createServerModal')}>
-                <GiServerRack className="mr-3 h-4 w-4" />
-                <p>
-                    New Server
-                </p>
-            </Button>
+            <div className="w-full mt-2">
+                <div className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
+                    {/* Table Options */}
+                    <div className="inline-flex">
+                        <Button className="mr-2" color="gray" onClick={() => props.setOpenModal('createServerModal')}>
+                            <GiServerRack className="mr-3 h-4 w-4" />
+                            <p>
+                                New Server
+                            </p>
+                        </Button>
 
-            <Button.Group className="mx-2">
-                {tableSelection.length != 1 ? (
-                    <Button color="gray" disabled>
-                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
-                        Execution Log
-                    </Button>
-                ):(
-                    <Button color="gray">
-                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
-                        Execution Log
-                    </Button>
-                )}
-                {tableSelection.length != 1 ? (
-                    <Button color="gray" disabled>
-                        <GiPencilRuler className="mr-3 h-4 w-4" />
-                        Edit
-                    </Button>
-                ):(
-                    <Button color="gray" onClick={ updateEditModalFormValues }>
-                        <GiPencilRuler className="mr-3 h-4 w-4" />
-                        Edit
-                    </Button>
-                )}
+                        <Button.Group className="mx-2">
+                            {tableSelection.length != 1 ? (
+                                <Button color="gray" disabled>
+                                    <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                                    Execution Log
+                                </Button>
+                            ):(
+                                <Button color="gray">
+                                    <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                                    Execution Log
+                                </Button>
+                            )}
+                            {tableSelection.length != 1 ? (
+                                <Button color="gray" disabled>
+                                    <GiPencilRuler className="mr-3 h-4 w-4" />
+                                    Edit
+                                </Button>
+                            ):(
+                                <Button color="gray" onClick={ updateEditModalFormValues }>
+                                    <GiPencilRuler className="mr-3 h-4 w-4" />
+                                    Edit
+                                </Button>
+                            )}
 
-                {tableSelection.length == 0 ? (
-                    <Button color="gray" disabled>
-                        <GiTrashCan className="mr-3 h-4 w-4" />
-                        Delete
-                    </Button>
-                ):(
-                    <Button color="gray">
-                        <GiTrashCan className="mr-3 h-4 w-4" />
-                        Delete
-                    </Button>
-                )}
-            </Button.Group>
+                            {tableSelection.length == 0 ? (
+                                <Button color="gray" disabled>
+                                    <GiTrashCan className="mr-3 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            ):(
+                                <Button color="gray">
+                                    <GiTrashCan className="mr-3 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            )}
+                        </Button.Group>
+                    </div>
+                    
+
+                    {/* Table Settings */}
+                    <Dropdown 
+                        color="gray"
+                        size="lg"
+                        inline
+                        label={<GiBigGear className="h-6 w-6" />}
+                    >
+                        <Dropdown.Header>
+                            <span className="block text-sm">
+                                Table Settings
+                            </span>
+                        </Dropdown.Header>
+                        <Dropdown.Header>
+                            <span className="block text-sm">
+                                Page Size
+                            </span>
+                            <form onSubmit={newPageSizeSubmit(onSubmitPageSize)}>
+                                <div className="flex items-center gap-2" >
+                                    <input
+                                        {...newPageSizeRegister('pageSize')}
+                                        type="radio"
+                                        checked
+                                        value="5"
+                                    />
+                                    <Label htmlFor="5">
+                                        5
+                                    </Label>
+                                </div>
+                                <div className="flex items-center gap-2" >
+                                    <input
+                                        {...newPageSizeRegister('pageSize')}
+                                        type="radio"
+                                        value="10"
+                                    />
+                                    <Label htmlFor="10">
+                                        10
+                                    </Label>
+                                </div>
+                                <div className="flex items-center gap-2" >
+                                    <input
+                                        {...newPageSizeRegister('pageSize')}
+                                        type="radio"
+                                        value="15"
+                                    />
+                                    <Label htmlFor="15">
+                                        15
+                                    </Label>
+                                </div>
+                        
+                                <Button className="mt-2" size="sm" color="gray" type="submit">
+                                    Apply
+                                </Button>
+                            </form>
+                        </Dropdown.Header>
+                    </Dropdown>
+                </div>
+            </div>
+            
         </div>
 
         {/* No Data State */}
@@ -471,7 +553,10 @@ export default function ServerTable() {
                                         <Checkbox onChange={ () => handleRowSelection(row) } defaultValue='false' />
                                     </Table.Cell>
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
-                                        {row.id}
+                                        <div className="inline-flex">
+                                            <CopyToClipboard content={row.id} />
+                                            <span className="ml-2">{row.id}</span>
+                                        </div>
                                     </Table.Cell>
                                     <Table.Cell className="w-4 px-10">
                                         {row.status=="TIMEOUT" && (<Tooltip content="Server Timed Out"><Badge icon={HiOutlineClock} color="warning"></Badge></Tooltip>)}
@@ -524,7 +609,7 @@ export default function ServerTable() {
             show={props.openModal === `editServer`} 
             onClose={() => props.setOpenModal(undefined)}
         >
-            <Modal.Header>Update Server Token</Modal.Header>
+            <Modal.Header>Update Server</Modal.Header>
             <Modal.Body>
                 <div className="space-y-6">
                     <form  onSubmit={updateSubmit(onSubmitUpdate)}>
