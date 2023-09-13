@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+  shadowDatabaseUrl = env("STAGING_DATABASE_URL")
+  relationMode = "prisma"
+}
+
+// cloud data model
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  image         String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  invite        Invite[]
+}
+
+model Invite {
+  id          String    @id @default(cuid())
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?   @unique
+  email       String    @unique
+  token       String    @unique @default(cuid())
+  sentAt      DateTime  @default(now())
+  expiresAt   DateTime  @default(now()) // set default to 48h via UI - need to support multiple databases & cannot use a uniform dbgenerated function
+  usedAt      DateTime?
+}
+
+model ServerToken {
+  id          String    @id @default(cuid())
+  name        String
+  token       String    @unique @default(uuid())
+  active      Boolean
+  createdAt   DateTime  @default(now())
+}
+
+
+// holdfast data model
+
+model Server {
+  id String @id @default(cuid())
+  name String @unique
+  description String?
+  lastRunDate DateTime?
+  status serverStatus
+  events ServerEvent[]
+}
+
+enum serverStatus {
+    ONLINE
+    OFFLINE
+    TIMEOUT
+}
+
+model ServerEvent {
+  id String @id @default(cuid())
+  serverId String
+  start DateTime @default(now())
+  end DateTime?
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  eventLogs ServerEventLog[]
+
+  @@index([serverId])
+}
+
+model ServerEventLog {
+  id String @id @default(cuid())
+  serverEventId String
+  serverEvent ServerEvent @relation(fields: [serverEventId], references: [id], onDelete: Cascade)
+  logType logType
+  timestamp DateTime @default(now())
+  playerCount Int
+
+  @@index([serverEventId])
+}
+
+enum logType {
+    START
+    END
+    HEARTBEAT
+    PLAYERJOIN
+    PLAYERLEAVE
+}
+
+model HoldfastUser {
+  id String @id @default(cuid())
+  steamId Int
+  isOnline Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  role UserRoles?
+}
+
+model UserRoles {
+  id String @id @default(cuid())
+  holdfastUserId String @unique
+  holdfastUser HoldfastUser @relation(fields: [holdfastUserId], references: [id])
+  roleId String @unique
+  holdfastRole holdfastRole @relation(fields: [roleId], references: [id])
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+}
+
+model holdfastRole {
+  id String @id @default(cuid())
+  name String
+  userRoles UserRoles[]
+}
