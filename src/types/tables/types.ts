@@ -13,3 +13,8 @@ export type servers = {
     description: string;
     lastRunDate: string;
 }
+
+export type tableRowSelection = {
+    name: string;
+    checked: boolean;
+}

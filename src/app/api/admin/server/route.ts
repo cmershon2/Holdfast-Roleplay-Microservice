@@ -177,12 +177,12 @@ export async function DELETE(req: NextRequest) {
 
         try {
 
-            const servertoken = await prisma.serverToken.delete({
+            const server = await prisma.server.delete({
                 where: {
                     id: id
                 }
             });
-            return NextResponse.json({ servertoken }, {status:200});
+            return NextResponse.json({ server }, {status:200});
 
         } catch (error) {
             return prismaErrorHandler('Error deleting server', error);

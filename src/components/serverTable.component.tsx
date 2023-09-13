@@ -3,19 +3,20 @@
 import { Button, Table, Badge, Modal, Label, TextInput, Select, Alert, Pagination, Tooltip, Checkbox, Radio, Textarea, Dropdown } from "flowbite-react";
 import { GiServerRack, GiPencilRuler, GiBigGear, GiTrashCan, GiInfo, GiScrollUnfurled } from 'react-icons/gi';
 import { HiStatusOffline, HiStatusOnline, HiOutlineClock } from 'react-icons/hi';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { servers } from "@/types/tables/types";
 import Moment from 'react-moment';
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { CopyToClipboard } from "./copyToClipboard.component";
+import { SearchStatusScreen } from "./statusMessages.component";
 
 export default function ServerTable() {
 
     // Init page states
     const [page, setPage] = useState<number>(0);
-    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(1);
     const [pageTotal, setPageTotal] = useState<number>(0);
     const [openModal, setOpenModal] = useState<string | undefined>();
@@ -24,10 +25,11 @@ export default function ServerTable() {
     const [data, setData] = useState<servers[]>()
     const [isLoading, setLoading] = useState(true)
     const [tableSelection, setTableSelection] = useState<servers[]>(new Array<servers>)
+    const rowCheckboxRef= useRef<HTMLInputElement[]>(new Array<HTMLInputElement>);
     
     // Get Inital Page Data
     useEffect(() => {
-        fetch('/api/admin/server?page=0&page_size=5')
+        fetch(`/api/admin/server?page=0&page_size=${pageSize}`)
         .then((res) => res.json())
         .then((data) => {
             var allServers : servers[] = data.servers.map((item : servers) => ({
@@ -46,6 +48,11 @@ export default function ServerTable() {
         })
     }, [])
 
+    // listen for table page size change
+    useEffect(() => {
+        reloadTableData(page, pageSize);
+    }, [pageSize]);
+
     const handleRowSelection = ( data : servers) => { 
     
         let newSelection = [...tableSelection];
@@ -60,6 +67,12 @@ export default function ServerTable() {
 
         setTableSelection(newSelection);
         
+    };
+
+    const uncheckAllRowSelections = () => {
+        rowCheckboxRef.current.forEach((checkbox) => {
+            checkbox.checked = false;
+        });
     };
     
     // Form Handlers
@@ -90,9 +103,7 @@ export default function ServerTable() {
     } = useForm();
 
     const {
-        handleSubmit: deleteTokenSubmit,
-        register: deleteTokenRegister,
-        setValue: setDeleteTokenValue
+        handleSubmit: deleteServerSubmit,
     } = useForm();
 
     // Refresh table data
@@ -109,6 +120,7 @@ export default function ServerTable() {
             }));
 
             let pageCalc = Math.ceil(parseInt(data.page.total) / pageSize);
+            uncheckAllRowSelections();
             setTableSelection(new Array<servers>);
             setPageTotal(parseInt(data.page.total))
             setPageCount(pageCalc)
@@ -129,10 +141,7 @@ export default function ServerTable() {
     }
 
     const updateDeleteModalFormValues = (data : servers) => {
-        setDeleteTokenValue('deleteTokenId', data.id);
-        setDeleteTokenValue('deleteTokenName', data.name);
-
-        props.setOpenModal(`deleteToken`);
+        props.setOpenModal(`deleteServer`);
     }
 
     // Handle Form Submissions
@@ -221,42 +230,41 @@ export default function ServerTable() {
 
         props.setButtonLoading(true);
 
-        try {
-            const response = await axios.delete('/api/admin/server/token', { data: {serverTokenId :data.deleteTokenId} });
+        tableSelection.forEach(async server => {
+            try {
+                const response = await axios.delete('/api/admin/server', { data: {id : server.id} });
+    
+                console.log(response.data.message);
+                props.setOpenModal(undefined);
+                props.setButtonLoading(false);
+                toast.success(`Server "${server.name}" Deleted`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                });
+                reloadTableData(page, pageSize);
+            } catch (error) {
+                console.error('Error deleting server token:', error);
+                props.setButtonLoading(false);
+                toast.error(`Server "${server.name}" Failed Deletion`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                })
+            }
+        });
 
-            console.log(response.data.message);
-            props.setOpenModal(undefined);
-            props.setButtonLoading(false);
-            toast.success("Server Token Deleted", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            });
-            reloadTableData(page, pageSize);
-        } catch (error) {
-            console.error('Error deleting server token:', error);
-            props.setButtonLoading(false);
-            toast.error("Server Token Deletion Failed", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            })
-        }
     };
-
-    useEffect(() => {
-        reloadTableData(page, pageSize);
-    }, [pageSize]);
 
     const onSubmitPageSize = async (data: any) => {
         setPage(0);
@@ -265,7 +273,7 @@ export default function ServerTable() {
 
     return(
     <>
-        {/* Table Buttons */}
+        {/* Table Options */}
         <div className='mb-4 flex'>
             <div className="w-full mt-2">
                 <div className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
@@ -278,100 +286,115 @@ export default function ServerTable() {
                             </p>
                         </Button>
 
-                        <Button.Group className="mx-2">
-                            {tableSelection.length != 1 ? (
-                                <Button color="gray" disabled>
-                                    <GiScrollUnfurled className="mr-3 h-4 w-4" />
-                                    Execution Log
-                                </Button>
-                            ):(
-                                <Button color="gray">
-                                    <GiScrollUnfurled className="mr-3 h-4 w-4" />
-                                    Execution Log
-                                </Button>
-                            )}
-                            {tableSelection.length != 1 ? (
-                                <Button color="gray" disabled>
-                                    <GiPencilRuler className="mr-3 h-4 w-4" />
-                                    Edit
-                                </Button>
-                            ):(
-                                <Button color="gray" onClick={ updateEditModalFormValues }>
-                                    <GiPencilRuler className="mr-3 h-4 w-4" />
-                                    Edit
-                                </Button>
-                            )}
+                        {!isLoading && (data !== undefined && data?.length > 0) &&
+                            <Button.Group className="mx-2">
+                                
+                                {/* tableSelection.length != 1 ? (
+                                    <Button color="gray" disabled>
+                                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                                        Execution Log
+                                    </Button>
+                                ):(
+                                    <Button color="gray">
+                                        <GiScrollUnfurled className="mr-3 h-4 w-4" />
+                                        Execution Log
+                                    </Button>
+                                ) */}
+                                {tableSelection.length != 1 ? (
+                                    <Button color="gray" disabled>
+                                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                ):(
+                                    <Button color="gray" onClick={ updateEditModalFormValues }>
+                                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                )}
 
-                            {tableSelection.length == 0 ? (
-                                <Button color="gray" disabled>
-                                    <GiTrashCan className="mr-3 h-4 w-4" />
-                                    Delete
-                                </Button>
-                            ):(
-                                <Button color="gray">
-                                    <GiTrashCan className="mr-3 h-4 w-4" />
-                                    Delete
-                                </Button>
-                            )}
-                        </Button.Group>
+                                {tableSelection.length == 0 ? (
+                                    <Button color="gray" disabled>
+                                        <GiTrashCan className="mr-3 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                ):(
+                                    <Button color="gray" onClick={ updateDeleteModalFormValues }>
+                                        <GiTrashCan className="mr-3 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                )}
+                            </Button.Group>
+                        }
                     </div>
                     
 
                     {/* Table Settings */}
-                    <Dropdown 
-                        color="gray"
-                        size="lg"
-                        inline
-                        label={<GiBigGear className="h-6 w-6" />}
-                    >
-                        <Dropdown.Header>
-                            <span className="block text-sm">
-                                Table Settings
-                            </span>
-                        </Dropdown.Header>
-                        <Dropdown.Header>
-                            <span className="block text-sm">
-                                Page Size
-                            </span>
-                            <form onSubmit={newPageSizeSubmit(onSubmitPageSize)}>
-                                <div className="flex items-center gap-2" >
-                                    <input
-                                        {...newPageSizeRegister('pageSize')}
-                                        type="radio"
-                                        checked
-                                        value="5"
-                                    />
-                                    <Label htmlFor="5">
-                                        5
-                                    </Label>
-                                </div>
-                                <div className="flex items-center gap-2" >
-                                    <input
-                                        {...newPageSizeRegister('pageSize')}
-                                        type="radio"
-                                        value="10"
-                                    />
-                                    <Label htmlFor="10">
-                                        10
-                                    </Label>
-                                </div>
-                                <div className="flex items-center gap-2" >
-                                    <input
-                                        {...newPageSizeRegister('pageSize')}
-                                        type="radio"
-                                        value="15"
-                                    />
-                                    <Label htmlFor="15">
-                                        15
-                                    </Label>
-                                </div>
-                        
-                                <Button className="mt-2" size="sm" color="gray" type="submit">
-                                    Apply
-                                </Button>
-                            </form>
-                        </Dropdown.Header>
-                    </Dropdown>
+                    {!isLoading && (data !== undefined && data?.length > 0) &&
+                        <Dropdown 
+                            color="gray"
+                            size="lg"
+                            inline
+                            label={<GiBigGear className="h-6 w-6" />}
+                        >
+                            <Dropdown.Header>
+                                <span className="block text-sm">
+                                    Table Settings
+                                </span>
+                            </Dropdown.Header>
+                            <Dropdown.Header>
+                                <span className="block text-sm">
+                                    Page Size
+                                </span>
+                                <form onSubmit={newPageSizeSubmit(onSubmitPageSize)}>
+                                    <div className="flex items-center gap-2" >
+                                        <input
+                                            {...newPageSizeRegister('pageSize')}
+                                            type="radio"
+                                            value="10"
+                                            checked
+                                        />
+                                        <Label htmlFor="10">
+                                            10
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2" >
+                                        <input
+                                            {...newPageSizeRegister('pageSize')}
+                                            type="radio"
+                                            value="25"
+                                        />
+                                        <Label htmlFor="25">
+                                            25
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2" >
+                                        <input
+                                            {...newPageSizeRegister('pageSize')}
+                                            type="radio"
+                                            value="50"
+                                        />
+                                        <Label htmlFor="50">
+                                            50
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2" >
+                                        <input
+                                            {...newPageSizeRegister('pageSize')}
+                                            type="radio"
+                                            value="100"
+                                        />
+                                        <Label htmlFor="100">
+                                            100
+                                        </Label>
+                                    </div>
+
+                                    <Button className="mt-2" size="sm" color="gray" type="submit">
+                                        Apply
+                                    </Button>
+                                </form>
+                            </Dropdown.Header>
+                        </Dropdown>
+                    }
                 </div>
             </div>
             
@@ -379,11 +402,7 @@ export default function ServerTable() {
 
         {/* No Data State */}
         { !isLoading && data == undefined || data?.length == 0 &&
-            <Alert color="info">
-                <p>
-                    It looks like you don't have any Server Tokens yet, let's make one to connect to your Holdfast server!
-                </p>
-            </Alert>
+            <SearchStatusScreen title="No Server Instances Found" message="Click the New Server option to get started!" />
         }
 
         {/* Table Loading State */}
@@ -511,12 +530,22 @@ export default function ServerTable() {
                         </Table.Row>
                     </Table.Body>
                 </Table>
-                <Pagination
-                    currentPage={1}
-                    onPageChange={ page=>{ } }
-                    showIcons
-                    totalPages={1}
-                />
+                <div className="w-full mt-2">
+                    <nav className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0"
+                        aria-label="Table navigation">
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span
+                            className="font-semibold text-gray-900 dark:text-white">0-0</span> of <span
+                            className="font-semibold text-gray-900 dark:text-white">0</span>
+                        </span>
+                        
+                        <Pagination
+                            currentPage={1}
+                            onPageChange={ page=>{} }
+                            showIcons
+                            totalPages={1}
+                        />
+                    </nav>
+                </div>
             </>
         }
         
@@ -550,7 +579,7 @@ export default function ServerTable() {
                                 return(
                                 <Table.Row key={row.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                     <Table.Cell className="w-4">
-                                        <Checkbox onChange={ () => handleRowSelection(row) } defaultValue='false' />
+                                        <Checkbox ref={(element) => { if(element != null)rowCheckboxRef.current.push(element); }} onChange={ () => handleRowSelection(row) } defaultValue='false' />
                                     </Table.Cell>
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
                                         <div className="inline-flex">
@@ -599,8 +628,6 @@ export default function ServerTable() {
                         />
                     </nav>
                 </div>
-                    
-                
             </>
         }
 
@@ -729,52 +756,52 @@ export default function ServerTable() {
 
         {/* Delete Server Modal */}
         <Modal  
-            show={props.openModal === `deleteToken`} 
+            show={props.openModal === `deleteServer`} 
             onClose={() => props.setOpenModal(undefined)}
         >
-            <Modal.Header>Delete Server Token</Modal.Header>
+            <Modal.Header>Delete Server Instances</Modal.Header>
             <Modal.Body>
                 <div className="space-y-6">
-                    <form onSubmit={deleteTokenSubmit(onSubmitDelete)}>
-                        <h5>Are you sure you want to delete the following Server Token?</h5>
-                        <div className="block mt-4">
-                            <Label
-                                htmlFor="deleteTokenId"
-                                value="Token ID"
-                            />
-                        </div>
-                        <TextInput
-                            {...deleteTokenRegister('deleteTokenId')}
-                            className="mb-2"
-                            id="deleteTokenId"
-                            placeholder="my holdfast token id"
-                            disabled
-                            type="text"
-                        />
+                    <form onSubmit={deleteServerSubmit(onSubmitDelete)}>
+                        <h5>Are you sure you want to delete the following Server Instances?</h5>
 
-                        <div className="block mt-2">
-                            <Label
-                                htmlFor="deleteTokenName"
-                                value="Token Name"
-                            />
-                        </div>
-                        <TextInput
-                            {...deleteTokenRegister('deleteTokenName')}
-                            className="mb-4"
-                            id="deleteTokenName"
-                            placeholder="my new holdfast token"
-                            disabled
-                            type="text"
-                        />
+                        <Table hoverable className="max-w-full mt-2">
+                            <Table.Head>
+                                <Table.HeadCell className="bg-gray-50 dark:bg-gray-600">
+                                    ID
+                                </Table.HeadCell>
+                                <Table.HeadCell className="bg-gray-50 dark:bg-gray-600">
+                                    Name
+                                </Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body>
+                                { tableSelection.length > 0 &&
+                                    tableSelection.map((row : servers) => {
+                                        return(
+                                            <Table.Row key={row.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
+                                                    <div className="inline-flex">
+                                                        <span className="ml-2">{row.id}</span>
+                                                    </div>
+                                                </Table.Cell>
+                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-1/4 truncate">
+                                                    {row.name}
+                                                </Table.Cell>
+                                            </Table.Row>                                            
+                                        )
+                                    })
+                                }
+                            </Table.Body>
+                        </Table>
 
                         <Alert
-                            className="mb-4"
+                            className="my-4"
                             color="failure"
                             icon={GiInfo}
                             >
                             <span>
                                 <p>
-                                    After deletion, all servers using the token will no longer be able to reach the Holdfast Roleplay Admin
+                                    Once deleted, all related server entities are deleted as well.
                                 </p>
                             </span>
                         </Alert>
@@ -784,7 +811,7 @@ export default function ServerTable() {
                             {props.buttonLoading &&
                                 <Button color="failure" isProcessing disabled>
                                     <p>
-                                        Delete Token
+                                        Delete Servers
                                     </p>
                                 </Button>
                             }
@@ -792,7 +819,7 @@ export default function ServerTable() {
                                 <Button color="failure" type="submit">
                                     <GiTrashCan className="mr-2 h-5 w-5" />
                                     <p>
-                                        Delete Token
+                                        Delete Servers
                                     </p>
                                 </Button>
                             }
