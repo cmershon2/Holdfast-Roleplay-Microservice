@@ -681,7 +681,6 @@ export default function ServerTable() {
                             id="editServerDescription"
                             className="mb-2"
                             placeholder="A short description about your server"
-                            required
                             rows={2}
                         />
 
@@ -715,7 +714,7 @@ export default function ServerTable() {
                         >
                         <span>
                             <p>
-                                Server tokens should be kept private and set to "Inactive" when not in use
+                                Server tokens should be kept private and set to &quot;Inactive&quot; when not in use
                             </p>
                         </span>
                         </Alert>

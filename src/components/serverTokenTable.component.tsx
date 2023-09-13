@@ -226,7 +226,7 @@ export default function ServerTokenTable() {
         { !isLoading && data == undefined || data?.length == 0 &&
             <Alert color="info">
                 <p>
-                    It looks like you don't have any Server Tokens yet, let's make one to connect to your Holdfast server!
+                    It looks like you don&apos;t have any Server Tokens yet, let&apos;s make one to connect to your Holdfast server!
                 </p>
             </Alert>
         }
@@ -473,7 +473,7 @@ export default function ServerTokenTable() {
                         >
                         <span>
                             <p>
-                                Server tokens should be kept private and set to "Inactive" when not in use
+                                Server tokens should be kept private and set to &quot;Inactive&quot; when not in use
                             </p>
                         </span>
                         </Alert>
