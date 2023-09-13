@@ -63,26 +63,32 @@ enum serverStatus {
 
 model ServerEvent {
   id String @id @default(cuid())
-  serverId String @unique
+  serverId String
   start DateTime @default(now())
-  end DateTime
+  end DateTime?
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   eventLogs ServerEventLog[]
+
+  @@index([serverId])
 }
 
 model ServerEventLog {
   id String @id @default(cuid())
-  serverEventId String @unique
+  serverEventId String
   serverEvent ServerEvent @relation(fields: [serverEventId], references: [id], onDelete: Cascade)
   logType logType
   timestamp DateTime @default(now())
   playerCount Int
+
+  @@index([serverEventId])
 }
 
 enum logType {
     START
     END
     HEARTBEAT
+    PLAYERJOIN
+    PLAYERLEAVE
 }
 
 model HoldfastUser {

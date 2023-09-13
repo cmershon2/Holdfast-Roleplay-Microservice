@@ -866,11 +866,10 @@ export default function ServerTable() {
                             />
                         </div>
                         <Textarea
-                            {...newServerRegister('newServerDescription', { required: false })}
+                            {...newServerRegister('newServerDescription',  { required: false })}
                             id="serverDescription"
                             className="mb-2"
                             placeholder="A short description about your server"
-                            required
                             rows={2}
                         />
 
