@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+// @ts-ignore
 import { hash } from 'bcrypt'
 
 const prisma = new PrismaClient()
