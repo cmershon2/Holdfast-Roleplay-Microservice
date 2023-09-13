@@ -66,14 +66,14 @@ model ServerEvent {
   serverId String @unique
   start DateTime @default(now())
   end DateTime
-  server Server @relation(fields: [serverId], references: [id])
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   eventLogs ServerEventLog[]
 }
 
 model ServerEventLog {
   id String @id @default(cuid())
   serverEventId String @unique
-  serverEvent ServerEvent @relation(fields: [serverEventId], references: [id])
+  serverEvent ServerEvent @relation(fields: [serverEventId], references: [id], onDelete: Cascade)
   logType logType
   timestamp DateTime @default(now())
   playerCount Int
