@@ -16,6 +16,7 @@
     "@dicebear/core": "^6.0.4",
     "@next-auth/prisma-adapter": "^0.4.4-canary.81",
     "@prisma/client": "^5.1.1",
+    "@types/bcrypt": "^5.0.0",
     "@types/node": "20.4.9",
     "@types/react": "18.2.19",
     "@types/react-dom": "18.2.7",
@@ -51,7 +52,6 @@
   "author": "Casey Mershon (aka Code Ducky)",
   "license": "MIT",
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
     "@types/cookie": "^0.5.1",
     "@types/nodemailer": "^6.4.9",
     "prisma": "^5.1.1"
