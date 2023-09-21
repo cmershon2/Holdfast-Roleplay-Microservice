@@ -5,7 +5,7 @@ spec:
     git:
       branch: main
       repo_clone_url: https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git
-    env:
+    envs:
     - key: NEXTAUTH_SECRET
       value: "Very Super Secret Text For Encrypting User Data"
       type: SECRET
