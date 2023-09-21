@@ -12,7 +12,7 @@ Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This
 
 ## Installation
 ### Quick Install
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/cmershon2/Holdfast-Roleplay-Microservice)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/cmershon2/Holdfast-Roleplay-Microservice/tree/main)
 ### Manual Install
 1. Clone the repository: `git clone https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git`
 2. Navigate to the project directory: `cd Holdfast-Roleplay-Microservice`
