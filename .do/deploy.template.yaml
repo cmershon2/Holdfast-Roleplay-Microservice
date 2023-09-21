@@ -8,7 +8,6 @@ spec:
     envs:
     - key: NEXTAUTH_SECRET
       value: "Very Super Secret Text For Encrypting User Data"
-      type: SECRET
     - key: NEXTAUTH_URL
       value: ${APP_URL}
       scope: RUN_TIME
@@ -16,7 +15,6 @@ spec:
       value: "smtp username"
     - key: SMTP_PASSWORD
       value: "smtp password"
-      type: SECRET
     - key: SMTP_EMAIL
       value: "no-reply@holdfast.com"
     - key: SMTP_PORT
@@ -27,7 +25,5 @@ spec:
       value: "production"
     - key: DATABASE_URL
       value: "mysql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
-      type: SECRET
     - key: STAGING_DATABASE_URL
       value: "mysql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
-      type: SECRET
