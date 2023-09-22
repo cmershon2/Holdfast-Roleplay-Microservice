@@ -11,6 +11,7 @@ async function main() {
     create: {
       email: 'admin@holdfast.com',
       name: 'Admin User',
+      role: 'ADMIN',
       password
     }
   })

@@ -14,6 +14,16 @@ export type servers = {
     lastRunDate: string;
 }
 
+export type holdfastUser = {
+    id: string;
+    steamId: string;
+    status: string;
+    isOnline: boolean;
+    createdAt: string;
+    updatedAt: string;
+    role: string;
+}
+
 export type tableRowSelection = {
     name: string;
     checked: boolean;
