@@ -191,6 +191,35 @@ export default function PlayerTable(user: User) {
                 <div className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
                     {/* Table Options */}
                     <div className="inline-flex">
+                        {user.role == "ADMIN" && (
+                            <Button.Group className="mx-2">
+                                
+                                {tableSelection.length != 1 ? (
+                                    <Button color="gray" disabled>
+                                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                ):(
+                                    <Button color="gray" >
+                                        <GiPencilRuler className="mr-3 h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                )}
+
+                                {tableSelection.length == 0 ? (
+                                    <Button color="gray" disabled>
+                                        <GiTrashCan className="mr-3 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                ):(
+                                    <Button color="gray" >
+                                        <GiTrashCan className="mr-3 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                )}
+                            </Button.Group>
+                            )
+                            }
                     </div>
                     
                     {/* Table Settings */}
@@ -463,17 +492,21 @@ export default function PlayerTable(user: User) {
                                     <Table.Cell className="w-36">
                                         {!row.createdAt && (<p>Never</p>)}
                                         {row.createdAt && (
-                                            <Moment format="MMM DD, YYYY h:mm:ss">
-                                                {row.createdAt}
-                                            </Moment>
+                                            <Tooltip content="Device Timezone">
+                                                <Moment format="MMM DD, YYYY h:mm:ss">
+                                                    {row.createdAt}
+                                                </Moment>
+                                            </Tooltip>
                                         )}
                                     </Table.Cell>
                                     <Table.Cell className="w-36">
                                         {!row.updatedAt && (<p>Never</p>)}
                                         {row.updatedAt && (
-                                            <Moment format="MMM DD, YYYY h:mm:ss">
-                                                {row.updatedAt}
-                                            </Moment>
+                                            <Tooltip content="Device Timezone">
+                                                <Moment format="MMM DD, YYYY h:mm:ss">
+                                                    {row.updatedAt}
+                                                </Moment>
+                                            </Tooltip>
                                         )}
                                     </Table.Cell>
                                 </Table.Row>

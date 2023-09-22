@@ -121,7 +121,7 @@ export const SidebarNavigation = ( user: User ) => {
                 ))
               }              
           </Sidebar.ItemGroup>
-          {`${user.role}` == "ADMIN"  && (
+          {user.role == "ADMIN"  && (
             <Sidebar.ItemGroup>
               {
                 SideBarAdminStructure.map((data) => (
