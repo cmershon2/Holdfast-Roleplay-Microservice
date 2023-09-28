@@ -334,16 +334,19 @@ export default function PlayerTable(user: User) {
                         <Table.HeadCell className="w-4">
                         </Table.HeadCell>
                         <Table.HeadCell className="w-4">
+                            Steam ID
+                        </Table.HeadCell>
+                        <Table.HeadCell className="w-4">
                             Status
                         </Table.HeadCell>
+                        <Table.HeadCell>
+                            Role
+                        </Table.HeadCell>
                         <Table.HeadCell className="w-36">
-                            Last Run Date
+                            Join Date
                         </Table.HeadCell>
                         <Table.HeadCell>
-                            Name
-                        </Table.HeadCell>
-                        <Table.HeadCell>
-                            Description
+                            Last Online
                         </Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
@@ -363,20 +366,6 @@ export default function PlayerTable(user: User) {
                             <Table.Cell>
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
-                        </Table.Row>
-                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
-                            <Table.Cell className="w-4">
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell className="w-4">
-                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell className="w-36">
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
                             <Table.Cell>
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
@@ -392,20 +381,6 @@ export default function PlayerTable(user: User) {
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
                             <Table.Cell>
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                        </Table.Row>
-                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
-                            <Table.Cell className="w-4">
-                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell className="w-4">
-                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
-                            </Table.Cell>
-                            <Table.Cell className="w-36">
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
                             <Table.Cell>
@@ -431,6 +406,9 @@ export default function PlayerTable(user: User) {
                             <Table.Cell>
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
                         </Table.Row>
                         <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
                             <Table.Cell className="w-4">
@@ -440,6 +418,49 @@ export default function PlayerTable(user: User) {
                                 <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
                             <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white h-4 dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-4">
+                                <div className="h-3 dark:bg-slate-700  bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell className="w-36">
+                                <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                            </Table.Cell>
+                            <Table.Cell>
                                 <div className="h-3 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
                             </Table.Cell>
                             <Table.Cell>
