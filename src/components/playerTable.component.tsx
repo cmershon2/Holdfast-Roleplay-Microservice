@@ -22,6 +22,7 @@ export default function PlayerTable(user: User) {
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(1);
     const [pageTotal, setPageTotal] = useState<number>(0);
+    const [updateTime, setUpdateTime] = useState<number>(Date.now());
     const [openModal, setOpenModal] = useState<string | undefined>();
     const [buttonLoading, setButtonLoading] = useState<boolean>();
     const props = { openModal, setOpenModal, buttonLoading, setButtonLoading };
@@ -109,7 +110,7 @@ export default function PlayerTable(user: User) {
         handleSubmit: deleteServerSubmit,
     } = useForm();
 
-    // Refresh table data
+    // refresh table
     const reloadTableData = (page : number, page_size : number) => {
         fetch(`/api/admin/players?page=${page}&page_size=${page_size}`)
         .then((res) => res.json())
@@ -130,8 +131,38 @@ export default function PlayerTable(user: User) {
             setPageCount(pageCalc)
             setData(allPlayers)
             setLoading(false)
+            setUpdateTime(Date.now());
         })
     }
+
+
+    // auto Refresh table data
+    useEffect(() => {
+        
+        let interval = setInterval( async function(){
+            await fetch(`/api/admin/players?page=${page}&page_size=${pageSize}`)
+            .then((res) => res.json())
+            .then((data) => {
+                var allPlayers : holdfastUser[] = data.players.map((item : holdfastUser) => ({
+                    id: item.id,
+                    steamId: item.steamId,
+                    isOnline: item.isOnline,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                    role: item.role
+                }));
+
+                setData(allPlayers)
+                setLoading(false)
+                setUpdateTime(Date.now());
+            })
+        }, 60000)
+
+        return () => {
+            clearInterval(interval);
+        };
+
+    }, []);
 
     
     const updateDeleteModalFormValues = (data : holdfastUser) => {
@@ -189,41 +220,36 @@ export default function PlayerTable(user: User) {
         <div className='mb-4 flex'>
             <div className="w-full mt-2">
                 <div className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
-                    {/* Table Options */}
-                    <div className="inline-flex">
+                    {/* Table Options - ADMIN Only */}
+                    <div className="inline-flex items-center ">
                         {user.role == "ADMIN" && (
-                            <Button.Group className="mx-2">
-                                
-                                {tableSelection.length != 1 ? (
-                                    <Button color="gray" disabled>
-                                        <GiPencilRuler className="mr-3 h-4 w-4" />
-                                        Edit
-                                    </Button>
-                                ):(
-                                    <Button color="gray" >
-                                        <GiPencilRuler className="mr-3 h-4 w-4" />
-                                        Edit
-                                    </Button>
-                                )}
-
+                            <>
                                 {tableSelection.length == 0 ? (
-                                    <Button color="gray" disabled>
+                                    <Button color="gray" className="mr-4" disabled>
                                         <GiTrashCan className="mr-3 h-4 w-4" />
                                         Delete
                                     </Button>
                                 ):(
-                                    <Button color="gray" >
+                                    <Button color="gray" className="mr-4" >
                                         <GiTrashCan className="mr-3 h-4 w-4" />
                                         Delete
                                     </Button>
                                 )}
-                            </Button.Group>
-                            )
-                            }
+                                
+                            </>
+                        )}
+                        { !isLoading && (data !== undefined && data?.length > 0) ? (
+                        <p className="mr-4 text-sm font-normal text-gray-500 dark:text-gray-400">
+                            <span>Last Updated:</span> <Moment format="h:mm.ss">{updateTime}</Moment>
+                        </p>
+                        ) : (
+                            <div className="h-3 w-36 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                        )}
                     </div>
                     
                     {/* Table Settings */}
                     {!isLoading && (data !== undefined && data?.length > 0) &&
+                        <>
                         <Dropdown 
                             color="gray"
                             size="lg"
@@ -288,6 +314,7 @@ export default function PlayerTable(user: User) {
                                 </form>
                             </Dropdown.Header>
                         </Dropdown>
+                        </>
                     }
                 </div>
             </div>
