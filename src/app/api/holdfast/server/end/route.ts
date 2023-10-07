@@ -47,41 +47,52 @@ export async function POST(req: Request, res: Response) {
         try {
             const currentTime = new Date();
 
-            // set server to offline
-            const server = await prisma.server.update({
-                where:{
-                    id: serverId,
-                    status: "ONLINE"
-                },
-                data: {
-                    status: 'OFFLINE',
-                    events: {
-                        update: [
-                            {
-                                where:{
-                                    id: eventId
-                                },
-                                data:{
-                                    end: currentTime,
-                                    eventLogs: {
-                                        create:[
-                                            {
-                                                logType: "END",
-                                                playerCount: playerCount
-                                            }
-                                        ]
+            const [server, players] = await prisma.$transaction([
+                prisma.server.update({
+                    where:{
+                        id: serverId,
+                        status: "ONLINE"
+                    },
+                    data: {
+                        status: 'OFFLINE',
+                        events: {
+                            update: [
+                                {
+                                    where:{
+                                        id: eventId
+                                    },
+                                    data:{
+                                        end: currentTime,
+                                        eventLogs: {
+                                            create:[
+                                                {
+                                                    logType: "END",
+                                                    playerCount: playerCount
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
-                            }
-                        ]
+                            ]
+                        }
+                    },
+                    include: {
+                        events: true
                     }
-                },
-                include: {
-                    events: true
-                }
-            });
+                }),
+                prisma.holdfastUser.updateMany({
+                    where: {
+                        isOnline: true
+                    },
+                    data: {
+                        isOnline: false
+                    }
+                })
+
+            ]);
+
             
-            return NextResponse.json({ message: 'Server end recorded successfully', event_id: server.events[0].id }, {status: 200});
+            return NextResponse.json({ message: 'Server end recorded successfully', event_id: eventId }, {status: 200});
 
         } catch (error) {
             return prismaErrorHandler('Error ending server monitoring', error);

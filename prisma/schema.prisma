@@ -22,6 +22,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   invite        Invite[]
+  role          Roles     @default(USER)
+}
+
+enum Roles {
+  USER
+  ADMIN
 }
 
 model Invite {
@@ -93,9 +99,10 @@ enum logType {
 
 model HoldfastUser {
   id String @id @default(cuid())
-  steamId Int
+  steamId Int @unique
   isOnline Boolean @default(false)
   createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt
   role UserRoles?
 }
 
@@ -103,9 +110,10 @@ model UserRoles {
   id String @id @default(cuid())
   holdfastUserId String @unique
   holdfastUser HoldfastUser @relation(fields: [holdfastUserId], references: [id])
-  roleId String @unique
+  roleId String
   holdfastRole holdfastRole @relation(fields: [roleId], references: [id])
-  updatedAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt
+  @@index([roleId])
 }
 
 model holdfastRole {

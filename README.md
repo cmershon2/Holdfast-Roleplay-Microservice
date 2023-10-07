@@ -11,6 +11,9 @@ Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This
 - **Modular and Extensible**: Built on Next.js, the microservice is highly modular and can be extended to accommodate additional features.
 
 ## Installation
+### Quick Install
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/cmershon2/Holdfast-Roleplay-Microservice/tree/main)
+### Manual Install
 1. Clone the repository: `git clone https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git`
 2. Navigate to the project directory: `cd Holdfast-Roleplay-Microservice`
 3. Install dependencies: `npm install`
@@ -19,10 +22,10 @@ Welcome to the Holdfast Roleplay Mircroservice for Holdfast Modded Servers! This
 ## Usage
 1. Start the development server: `npm run dev`
 2. Access the web interface by navigating to `http://localhost:3000` in your web browser.
-3. Explore the API documentation at `http://localhost:3000/api/docs` to understand and utilize the available endpoints.
+3. Explore the API documentation at [our dedicated documentation site](https://holdfast-roleplay-docs.projecthost.dev) to understand and utilize the available endpoints.
 
 ## API Endpoints
-The microservice provides various API endpoints to interact with roleplay content programmatically. For detailed information about each endpoint and how to use them, refer to the [API Documentation](http://localhost:3000/docs).
+The microservice provides various API endpoints to interact with roleplay content programmatically. For detailed information about each endpoint and how to use them, refer to the [API Documentation](https://holdfast-roleplay-docs.projecthost.dev/docs/category/api-endpoints).
 
 ## Contributing
 Contributions are welcome! If you'd like to contribute to the project, follow these steps:

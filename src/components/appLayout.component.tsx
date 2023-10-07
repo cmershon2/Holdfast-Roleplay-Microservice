@@ -13,7 +13,7 @@ export default async function AppLayout({ children } : any ) {
         name: session!.user?.name!,
         avatar: session!.user?.image!,
         email: session!.user?.email!,
-        role: "ADMIN"
+        role: session!.user?.role!,
     }
 
     return(

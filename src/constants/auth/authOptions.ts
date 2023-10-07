@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { compare } from 'bcrypt';
 import CredentialsProvider from "next-auth/providers/credentials"
 import { NextAuthOptions } from "next-auth";
+import { Role } from './roles';
+
 
 export const authOptions: NextAuthOptions = {
     session: {
@@ -9,7 +11,7 @@ export const authOptions: NextAuthOptions = {
     },
     providers: [
         CredentialsProvider({
-            name: "Sign in",
+            name: "email",
             credentials: {
                 email: {
                     label: 'Email',
@@ -52,7 +54,7 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     name: user.name,
                     image: `https://api.dicebear.com/6.x/shapes/svg?seed=${user.name}`,
-                    role: "ADMIN"
+                    role: Role[user.role]
                 }
             }
         })

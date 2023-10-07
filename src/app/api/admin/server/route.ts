@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const token = await getToken({req})
 
-    if (!token) {
+    if (!token || token.role !== "ADMIN") {
         return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
     }
 
@@ -48,7 +48,7 @@ export async function PATCH(req: NextRequest) {
     const token = await getToken({req})
     const data = await getRequestBody(req);
 
-    if (!token) {
+    if (!token || token.role !== "ADMIN") {
         return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
     }
 
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     const data = await getRequestBody(req);
 
 
-    if (!token) {
+    if (!token || token.role !== "ADMIN") {
         return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
     }
 
@@ -151,7 +151,7 @@ export async function DELETE(req: NextRequest) {
     const token = await getToken({req})
     const data = await getRequestBody(req);
 
-    if (!token) {
+    if (!token || token.role !== "ADMIN") {
         return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
     }
 

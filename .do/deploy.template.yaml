@@ -1,0 +1,29 @@
+spec:
+  name: holdfast-roleplay-microservice
+  services:
+  - name: web
+    git:
+      branch: main
+      repo_clone_url: https://github.com/cmershon2/Holdfast-Roleplay-Microservice.git
+    envs:
+    - key: NEXTAUTH_SECRET
+      value: "Very Super Secret Text For Encrypting User Data"
+    - key: NEXTAUTH_URL
+      value: ${APP_URL}
+      scope: RUN_TIME
+    - key: SMTP_USERNAME
+      value: "smtp username"
+    - key: SMTP_PASSWORD
+      value: "smtp password"
+    - key: SMTP_EMAIL
+      value: "no-reply@holdfast.com"
+    - key: SMTP_PORT
+      value: "587"
+    - key: SMTP_HOST
+      value: "smtp.hostname.io"
+    - key: NODE_ENV
+      value: "production"
+    - key: DATABASE_URL
+      value: "mysql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+    - key: STAGING_DATABASE_URL
+      value: "mysql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"

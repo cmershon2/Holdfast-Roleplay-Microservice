@@ -1,5 +1,6 @@
 'use client'
 
+import { Role } from "@/constants/auth/roles";
 import { SideBarAdminStructure, SideBarStructure } from "@/constants/entities/sideBarStructure";
 import { sideBarLink } from "@/types/navigation/types";
 import { User } from "@/types/user/types";
@@ -110,7 +111,6 @@ const SidebarLink = ( link : sideBarLink ) => {
 };
 
 export const SidebarNavigation = ( user: User ) => {
-
   return(
     <Sidebar theme={customTheme} aria-label="Sidebar Navigation">
       <Sidebar.Items>
@@ -121,7 +121,7 @@ export const SidebarNavigation = ( user: User ) => {
                 ))
               }              
           </Sidebar.ItemGroup>
-          {user.role == 'ADMIN' && (
+          {user.role == "ADMIN"  && (
             <Sidebar.ItemGroup>
               {
                 SideBarAdminStructure.map((data) => (
