@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from "next/server";
 import { prismaErrorHandler } from "@/lib/prismaErrorHandler";
 import { getToken } from "next-auth/jwt";
+import { getRequestBody } from '@/lib/apiHelpers';
+import { z } from "zod";
 
 // Get paginated players
 export async function GET(req: NextRequest) {
@@ -37,6 +39,55 @@ export async function GET(req: NextRequest) {
         
     } catch (error) {
         console.error('Error getting players:', error);
+        return NextResponse.json({ message: 'Internal server error.' }, {status:500});
+    }
+}
+
+// delete a player
+export async function DELETE(req: NextRequest) {
+    const token = await getToken({req})
+    const data = await getRequestBody(req);
+
+    // must be ADMIN to delete players
+    if (!token || token.role !== "ADMIN") {
+        return NextResponse.json({ message: 'Unauthorized' }, {status: 403});
+    }
+
+    if(data == null){
+        return NextResponse.json({ message: 'Invalid request', errors:[{message:"Missing or malformed request body"}] }, {status: 400});
+    }
+
+    // zod data validation
+    const schema = z.object({
+        id: z.string()
+    })
+    
+    const response = schema.safeParse(data);
+
+    if (!response.success) {
+        const { errors } = response.error;
+        return NextResponse.json({ message: 'Invalid request', errors }, {status: 400});
+    }
+
+    const { id } = response.data;
+
+    try {
+
+        try {
+
+            const player = await prisma.holdfastUser.delete({
+                where: {
+                    id: id
+                }
+            });
+            return NextResponse.json({ player }, {status:200});
+
+        } catch (error) {
+            return prismaErrorHandler('Error deleting player', error);
+        }
+        
+    } catch (error) {
+        console.error('Error deleting player:', error);
         return NextResponse.json({ message: 'Internal server error.' }, {status:500});
     }
 }

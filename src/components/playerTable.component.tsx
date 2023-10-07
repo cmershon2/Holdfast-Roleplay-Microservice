@@ -166,21 +166,21 @@ export default function PlayerTable(user: User) {
 
     
     const updateDeleteModalFormValues = (data : holdfastUser) => {
-        props.setOpenModal(`deleteServer`);
+        props.setOpenModal(`deletePlayer`);
     }
 
     const onSubmitDelete = async (data: any) => {
 
         props.setButtonLoading(true);
 
-        tableSelection.forEach(async server => {
+        tableSelection.forEach(async player => {
             try {
-                const response = await axios.delete('/api/admin/server', { data: {id : server.id} });
+                const response = await axios.delete('/api/admin/players', { data: {id : player.id} });
     
                 console.log(response.data.message);
                 props.setOpenModal(undefined);
                 props.setButtonLoading(false);
-                toast.success(`Server Deleted`, {
+                toast.success(`Player Deleted`, {
                     position: "top-right",
                     autoClose: 5000,
                     hideProgressBar: false,
@@ -192,9 +192,8 @@ export default function PlayerTable(user: User) {
                 });
                 reloadTableData(page, pageSize);
             } catch (error) {
-                console.error('Error deleting server token:', error);
                 props.setButtonLoading(false);
-                toast.error(`Server Failed Deletion`, {
+                toast.error(`Player Failed Deletion`, {
                     position: "top-right",
                     autoClose: 5000,
                     hideProgressBar: false,
@@ -230,7 +229,7 @@ export default function PlayerTable(user: User) {
                                         Delete
                                     </Button>
                                 ):(
-                                    <Button color="gray" className="mr-4" >
+                                    <Button color="gray" className="mr-4" onClick={ updateDeleteModalFormValues }>
                                         <GiTrashCan className="mr-3 h-4 w-4" />
                                         Delete
                                     </Button>
@@ -582,40 +581,34 @@ export default function PlayerTable(user: User) {
             </>
         }
 
-        {/* Delete Server Modal */}
+        {/* Delete Player Modal */}
         <Modal  
-            show={props.openModal === `deleteServer`} 
+            show={props.openModal === `deletePlayer`} 
             onClose={() => props.setOpenModal(undefined)}
         >
-            <Modal.Header>Delete Server Instances</Modal.Header>
+            <Modal.Header>Delete Players</Modal.Header>
             <Modal.Body>
                 <div className="space-y-6">
                     <form onSubmit={deleteServerSubmit(onSubmitDelete)}>
-                        <h5>Are you sure you want to delete the following Server Instances?</h5>
+                        <h5>Are you sure you want to delete the following Players?</h5>
 
                         <Table hoverable className="max-w-full mt-2">
                             <Table.Head>
                                 <Table.HeadCell className="bg-gray-50 dark:bg-gray-600">
-                                    ID
-                                </Table.HeadCell>
-                                <Table.HeadCell className="bg-gray-50 dark:bg-gray-600">
-                                    Name
+                                    Steam ID
                                 </Table.HeadCell>
                             </Table.Head>
                             <Table.Body>
                                 { tableSelection.length > 0 &&
                                     tableSelection.map((row : holdfastUser) => {
                                         return(
-                                            <Table.Row key={row.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
-                                                    <div className="inline-flex">
-                                                        <span className="ml-2">{row.id}</span>
-                                                    </div>
-                                                </Table.Cell>
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-1/4 truncate">
-                                                    {row.steamId}
-                                                </Table.Cell>
-                                            </Table.Row>                                            
+                                        <Table.Row key={row.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white w-60 truncate">
+                                                <div className="inline-flex">
+                                                    <span className="ml-2">{row.steamId}</span>
+                                                </div>
+                                            </Table.Cell>
+                                        </Table.Row>                                            
                                         )
                                     })
                                 }
@@ -629,7 +622,7 @@ export default function PlayerTable(user: User) {
                             >
                             <span>
                                 <p>
-                                    Once deleted, all related server entities are deleted as well.
+                                    Once deleted, all related player entities are deleted as well.
                                 </p>
                             </span>
                         </Alert>
@@ -639,7 +632,7 @@ export default function PlayerTable(user: User) {
                             {props.buttonLoading &&
                                 <Button color="failure" isProcessing disabled>
                                     <p>
-                                        Delete Servers
+                                        Delete Players
                                     </p>
                                 </Button>
                             }
@@ -647,7 +640,7 @@ export default function PlayerTable(user: User) {
                                 <Button color="failure" type="submit">
                                     <GiTrashCan className="mr-2 h-5 w-5" />
                                     <p>
-                                        Delete Servers
+                                        Delete Players
                                     </p>
                                 </Button>
                             }
