@@ -220,99 +220,101 @@ export default function PlayerTable(user: User) {
             <div className="w-full mt-2">
                 <div className="flex flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
                     {/* Table Options - ADMIN Only */}
-                    <div className="inline-flex items-center ">
-                        {user.role == "ADMIN" && (
-                            <>
-                                {tableSelection.length == 0 ? (
-                                    <Button color="gray" className="mr-4" disabled>
-                                        <GiTrashCan className="mr-3 h-4 w-4" />
-                                        Delete
-                                    </Button>
-                                ):(
-                                    <Button color="gray" className="mr-4" onClick={ updateDeleteModalFormValues }>
-                                        <GiTrashCan className="mr-3 h-4 w-4" />
-                                        Delete
-                                    </Button>
-                                )}
-                                
-                            </>
-                        )}
-                        { !isLoading && (data !== undefined && data?.length > 0) ? (
-                        <p className="mr-4 text-sm font-normal text-gray-500 dark:text-gray-400">
-                            <span>Last Updated:</span> <Moment format="h:mm.ss">{updateTime}</Moment>
-                        </p>
-                        ) : (
-                            <div className="h-3 w-36 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
-                        )}
-                    </div>
-                    
-                    {/* Table Settings */}
-                    {!isLoading && (data !== undefined && data?.length > 0) &&
+                    { !isLoading && (data !== undefined && data?.length > 0) &&
                         <>
-                        <Dropdown 
-                            color="gray"
-                            size="lg"
-                            inline
-                            label={<GiBigGear className="h-6 w-6" />}
-                        >
-                            <Dropdown.Header>
-                                <span className="block text-sm">
-                                    Table Settings
-                                </span>
-                            </Dropdown.Header>
-                            <Dropdown.Header>
-                                <span className="block text-sm">
-                                    Page Size
-                                </span>
-                                <form onSubmit={newPageSizeSubmit(onSubmitPageSize)}>
-                                    <div className="flex items-center gap-2" >
-                                        <input
-                                            {...newPageSizeRegister('pageSize')}
-                                            type="radio"
-                                            value="10"
-                                            checked
-                                        />
-                                        <Label htmlFor="10">
-                                            10
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center gap-2" >
-                                        <input
-                                            {...newPageSizeRegister('pageSize')}
-                                            type="radio"
-                                            value="25"
-                                        />
-                                        <Label htmlFor="25">
-                                            25
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center gap-2" >
-                                        <input
-                                            {...newPageSizeRegister('pageSize')}
-                                            type="radio"
-                                            value="50"
-                                        />
-                                        <Label htmlFor="50">
-                                            50
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center gap-2" >
-                                        <input
-                                            {...newPageSizeRegister('pageSize')}
-                                            type="radio"
-                                            value="100"
-                                        />
-                                        <Label htmlFor="100">
-                                            100
-                                        </Label>
-                                    </div>
+                            <div className="inline-flex items-center ">
+                                {user.role == "ADMIN" && (
+                                    <>
+                                        {tableSelection.length == 0 ? (
+                                            <Button color="gray" className="mr-4" disabled>
+                                                <GiTrashCan className="mr-3 h-4 w-4" />
+                                                Delete
+                                            </Button>
+                                        ):(
+                                            <Button color="gray" className="mr-4" onClick={ updateDeleteModalFormValues }>
+                                                <GiTrashCan className="mr-3 h-4 w-4" />
+                                                Delete
+                                            </Button>
+                                        )}
+                                        
+                                    </>
+                                )}
+                                { !isLoading && (data !== undefined && data?.length > 0) ? (
+                                <p className="mr-4 text-sm font-normal text-gray-500 dark:text-gray-400">
+                                    <span>Last Updated:</span> <Moment format="h:mm.ss">{updateTime}</Moment>
+                                </p>
+                                ) : (
+                                    <div className="h-3 w-36 dark:bg-slate-700 bg-slate-200 rounded animate-pulse"></div>
+                                )}
+                            </div>
+                    
+                            {/* Table Settings */}
+                            <>
+                                <Dropdown 
+                                    color="gray"
+                                    size="lg"
+                                    inline
+                                    label={<GiBigGear className="h-6 w-6" />}
+                                >
+                                    <Dropdown.Header>
+                                        <span className="block text-sm">
+                                            Table Settings
+                                        </span>
+                                    </Dropdown.Header>
+                                    <Dropdown.Header>
+                                        <span className="block text-sm">
+                                            Page Size
+                                        </span>
+                                        <form onSubmit={newPageSizeSubmit(onSubmitPageSize)}>
+                                            <div className="flex items-center gap-2" >
+                                                <input
+                                                    {...newPageSizeRegister('pageSize')}
+                                                    type="radio"
+                                                    value="10"
+                                                    checked
+                                                />
+                                                <Label htmlFor="10">
+                                                    10
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center gap-2" >
+                                                <input
+                                                    {...newPageSizeRegister('pageSize')}
+                                                    type="radio"
+                                                    value="25"
+                                                />
+                                                <Label htmlFor="25">
+                                                    25
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center gap-2" >
+                                                <input
+                                                    {...newPageSizeRegister('pageSize')}
+                                                    type="radio"
+                                                    value="50"
+                                                />
+                                                <Label htmlFor="50">
+                                                    50
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center gap-2" >
+                                                <input
+                                                    {...newPageSizeRegister('pageSize')}
+                                                    type="radio"
+                                                    value="100"
+                                                />
+                                                <Label htmlFor="100">
+                                                    100
+                                                </Label>
+                                            </div>
 
-                                    <Button className="mt-2" size="sm" color="gray" type="submit">
-                                        Apply
-                                    </Button>
-                                </form>
-                            </Dropdown.Header>
-                        </Dropdown>
+                                            <Button className="mt-2" size="sm" color="gray" type="submit">
+                                                Apply
+                                            </Button>
+                                        </form>
+                                    </Dropdown.Header>
+                                </Dropdown>
+                            </>
                         </>
                     }
                 </div>
